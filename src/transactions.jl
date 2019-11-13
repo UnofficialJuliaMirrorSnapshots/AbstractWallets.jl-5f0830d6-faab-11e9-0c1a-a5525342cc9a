@@ -1,24 +1,26 @@
 # src/transactions.jl
-# Transaction API for Wallets
+# Transactions for Wallets
 
 export AbstractTransaction,
        AbstractSendTransaction,
        AbstractDestroyTransaction,
        statetype,
        stateof,
+       associatedfee,
        history,
        transactions_between,
        withdrawls,
        deposits,
        build_send_transaction,
        build_destroy_transaction,
+       sign!,
        execute!,
        cancel!,
        rollback!,
        cancelback!,
-       has_executed,
        is_pending,
-       was_fulfilled,
+       has_executed,
+       was_completed,
        was_cancelled,
        failed,
        send!,
@@ -72,6 +74,16 @@ Return the current state (of type `S`) of the transaction.
 """
 function stateof(transaction::AbstractTransaction{S})::S where {S}
     missing_api("stateof", transaction)
+end
+
+
+"""```
+associatedfee(transaction::AbstractTransaction)
+```
+Return the fee associated to the given `transaction`.
+"""
+function associatedfee(transaction::AbstractTransaction)::AbstractDestroyTransaction
+    missing_api("associatedfee", transaction)
 end
 
 
@@ -198,6 +210,16 @@ end
 
 
 """```
+sign!(transaction::AbstractTransaction)
+```
+Sign the given `transaction`.
+"""
+function sign!(transaction::AbstractTransaction, parties)
+    missing_api("sign!", transaction, parties)
+end
+
+
+"""```
 execute!(transaction::AbstractTransaction)
 ```
 Execute the given `transaction` and wait for a return signal.
@@ -237,7 +259,7 @@ function cancelback!(
     onsuccess = identity,
     onfailure = identity,
 )
-    if was_fulfilled(transaction)
+    if was_completed(transaction)
         return rollback!(transaction)
     elseif is_pending(transaction)
         return cancel!(transaction)
@@ -246,16 +268,6 @@ function cancelback!(
     else
         return onfailure(transaction)
     end
-end
-
-
-"""```
-has_executed(transaction::AbstractTransaction)::Bool
-```
-Check if `transaction` has been executed.
-"""
-function has_executed(transaction::AbstractTransaction)::Bool
-    missing_api("has_executed", transaction)
 end
 
 
@@ -270,12 +282,22 @@ end
 
 
 """```
-was_fulfilled(transaction::AbstractTransaction)::Bool
+has_executed(transaction::AbstractTransaction)::Bool
+```
+Check if `transaction` has been executed.
+"""
+function has_executed(transaction::AbstractTransaction)::Bool
+    missing_api("has_executed", transaction)
+end
+
+
+"""```
+was_completed(transaction::AbstractTransaction)::Bool
 ```
 Check if `transaction` was fulfilled.
 """
-function was_fulfilled(transaction::AbstractTransaction)::Bool
-    missing_api("was_fulfilled", transaction)
+function was_completed(transaction::AbstractTransaction)::Bool
+    missing_api("was_completed", transaction)
 end
 
 
